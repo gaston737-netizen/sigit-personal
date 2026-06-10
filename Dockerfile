@@ -21,6 +21,5 @@ COPY --from=builder /app/artifacts/api-server/dist ./artifacts/api-server/dist
 COPY --from=builder /app/artifacts/sigit/dist ./artifacts/sigit/dist
 
 ENV NODE_ENV=production
-EXPOSE 3000
 
 CMD ["node", "--enable-source-maps", "artifacts/api-server/dist/index.mjs"]
