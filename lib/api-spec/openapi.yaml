@@ -1,0 +1,710 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: SIGIT Personal API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: interconsultas
+    description: Interconsulta operations
+  - name: observaciones
+    description: Observation operations
+  - name: adjuntos
+    description: Attachment operations
+  - name: dashboard
+    description: Dashboard operations
+  - name: alertas
+    description: Alert operations
+  - name: seguimiento
+    description: Daily follow-up
+  - name: reportes
+    description: Report operations
+  - name: configuracion
+    description: Configuration operations
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /interconsultas:
+    get:
+      operationId: listInterconsultas
+      tags: [interconsultas]
+      summary: List interconsultas with optional filters
+      parameters:
+        - name: estado
+          in: query
+          schema:
+            type: string
+        - name: especialidad
+          in: query
+          schema:
+            type: string
+        - name: alerta
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: searchBy
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of interconsultas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Interconsulta"
+    post:
+      operationId: createInterconsulta
+      tags: [interconsultas]
+      summary: Create a new interconsulta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InterconsultaInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Interconsulta"
+
+  /interconsultas/{id}:
+    get:
+      operationId: getInterconsulta
+      tags: [interconsultas]
+      summary: Get interconsulta by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Interconsulta detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InterconsultaDetalle"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateInterconsulta
+      tags: [interconsultas]
+      summary: Update interconsulta
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InterconsultaUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Interconsulta"
+    delete:
+      operationId: deleteInterconsulta
+      tags: [interconsultas]
+      summary: Delete interconsulta
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /interconsultas/{id}/estado:
+    patch:
+      operationId: cambiarEstado
+      tags: [interconsultas]
+      summary: Change estado of interconsulta
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CambiarEstadoInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Interconsulta"
+
+  /interconsultas/{id}/observaciones:
+    get:
+      operationId: listObservaciones
+      tags: [observaciones]
+      summary: List observations for interconsulta
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of observations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Observacion"
+    post:
+      operationId: createObservacion
+      tags: [observaciones]
+      summary: Add observation to interconsulta
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ObservacionInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Observacion"
+
+  /interconsultas/{id}/adjuntos:
+    get:
+      operationId: listAdjuntos
+      tags: [adjuntos]
+      summary: List attachments for interconsulta
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of attachments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Adjunto"
+    post:
+      operationId: createAdjunto
+      tags: [adjuntos]
+      summary: Add attachment to interconsulta
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdjuntoInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Adjunto"
+
+  /dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [dashboard]
+      summary: Get dashboard summary statistics
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /alertas:
+    get:
+      operationId: getAlertas
+      tags: [alertas]
+      summary: Get critical interconsultas exceeding alert thresholds
+      responses:
+        "200":
+          description: Alert list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AlertaItem"
+
+  /seguimiento-diario:
+    get:
+      operationId: getSeguimientoDiario
+      tags: [seguimiento]
+      summary: Get daily follow-up grouped by inactivity days
+      responses:
+        "200":
+          description: Daily follow-up data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeguimientoDiario"
+
+  /reportes:
+    get:
+      operationId: getReporte
+      tags: [reportes]
+      summary: Generate monthly report
+      parameters:
+        - name: mes
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: anio
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: tipo
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Report data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReporteData"
+
+  /configuracion:
+    get:
+      operationId: getConfiguracion
+      tags: [configuracion]
+      summary: Get configuration
+      responses:
+        "200":
+          description: Configuration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Configuracion"
+    put:
+      operationId: updateConfiguracion
+      tags: [configuracion]
+      summary: Update configuration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfiguracionInput"
+      responses:
+        "200":
+          description: Updated configuration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Configuracion"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+
+    Interconsulta:
+      type: object
+      required: [id, prontuario, apellidoNombre, especialidad, estado, diasTranscurridos, fechaInterconsulta, prioridad, alerta]
+      properties:
+        id:
+          type: integer
+        prontuario:
+          type: string
+        dni:
+          type: ["string", "null"]
+        apellidoNombre:
+          type: string
+        pabellon:
+          type: ["string", "null"]
+        complejoUnidad:
+          type: ["string", "null"]
+        especialidad:
+          type: string
+        medicoSolicitante:
+          type: ["string", "null"]
+        prioridad:
+          type: string
+        motivo:
+          type: ["string", "null"]
+        estado:
+          type: string
+        fechaInterconsulta:
+          type: string
+        expedienteGde:
+          type: ["string", "null"]
+        fechaEnvio:
+          type: ["string", "null"]
+        fechaTurno:
+          type: ["string", "null"]
+        fechaAtencion:
+          type: ["string", "null"]
+        ultimoMovimiento:
+          type: ["string", "null"]
+        diasTranscurridos:
+          type: integer
+        alerta:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    InterconsultaDetalle:
+      type: object
+      required: [id, prontuario, apellidoNombre, especialidad, estado, diasTranscurridos, fechaInterconsulta, prioridad, alerta, observaciones, adjuntos]
+      properties:
+        id:
+          type: integer
+        prontuario:
+          type: string
+        dni:
+          type: ["string", "null"]
+        apellidoNombre:
+          type: string
+        pabellon:
+          type: ["string", "null"]
+        complejoUnidad:
+          type: ["string", "null"]
+        especialidad:
+          type: string
+        medicoSolicitante:
+          type: ["string", "null"]
+        prioridad:
+          type: string
+        motivo:
+          type: ["string", "null"]
+        estado:
+          type: string
+        fechaInterconsulta:
+          type: string
+        expedienteGde:
+          type: ["string", "null"]
+        fechaEnvio:
+          type: ["string", "null"]
+        fechaTurno:
+          type: ["string", "null"]
+        fechaAtencion:
+          type: ["string", "null"]
+        ultimoMovimiento:
+          type: ["string", "null"]
+        diasTranscurridos:
+          type: integer
+        alerta:
+          type: string
+        observaciones:
+          type: array
+          items:
+            $ref: "#/components/schemas/Observacion"
+        adjuntos:
+          type: array
+          items:
+            $ref: "#/components/schemas/Adjunto"
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    InterconsultaInput:
+      type: object
+      required: [prontuario, apellidoNombre, especialidad, prioridad, fechaInterconsulta]
+      properties:
+        prontuario:
+          type: string
+        dni:
+          type: string
+        apellidoNombre:
+          type: string
+        pabellon:
+          type: string
+        complejoUnidad:
+          type: string
+        especialidad:
+          type: string
+        medicoSolicitante:
+          type: string
+        prioridad:
+          type: string
+        motivo:
+          type: string
+        fechaInterconsulta:
+          type: string
+        expedienteGde:
+          type: string
+        observacionInicial:
+          type: string
+
+    InterconsultaUpdate:
+      type: object
+      properties:
+        prontuario:
+          type: string
+        dni:
+          type: string
+        apellidoNombre:
+          type: string
+        pabellon:
+          type: string
+        complejoUnidad:
+          type: string
+        especialidad:
+          type: string
+        medicoSolicitante:
+          type: string
+        prioridad:
+          type: string
+        motivo:
+          type: string
+        fechaInterconsulta:
+          type: string
+        expedienteGde:
+          type: string
+        fechaEnvio:
+          type: string
+        fechaTurno:
+          type: string
+        fechaAtencion:
+          type: string
+
+    CambiarEstadoInput:
+      type: object
+      required: [estado]
+      properties:
+        estado:
+          type: string
+        observacion:
+          type: string
+
+    Observacion:
+      type: object
+      required: [id, interconsultaId, texto, fecha]
+      properties:
+        id:
+          type: integer
+        interconsultaId:
+          type: integer
+        texto:
+          type: string
+        fecha:
+          type: string
+        createdAt:
+          type: string
+
+    ObservacionInput:
+      type: object
+      required: [texto]
+      properties:
+        texto:
+          type: string
+
+    Adjunto:
+      type: object
+      required: [id, interconsultaId, nombre, tipo]
+      properties:
+        id:
+          type: integer
+        interconsultaId:
+          type: integer
+        nombre:
+          type: string
+        tipo:
+          type: string
+        ruta:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    AdjuntoInput:
+      type: object
+      required: [nombre, tipo]
+      properties:
+        nombre:
+          type: string
+        tipo:
+          type: string
+        ruta:
+          type: string
+
+    DashboardStats:
+      type: object
+      required: [fecha, pendientes, conTurno, atendidos, criticos, alertasActivas]
+      properties:
+        fecha:
+          type: string
+        pendientes:
+          type: integer
+        conTurno:
+          type: integer
+        atendidos:
+          type: integer
+        criticos:
+          type: integer
+        alertasActivas:
+          type: array
+          items:
+            $ref: "#/components/schemas/AlertaItem"
+
+    AlertaItem:
+      type: object
+      required: [id, prontuario, apellidoNombre, especialidad, diasTranscurridos, alerta, estado]
+      properties:
+        id:
+          type: integer
+        prontuario:
+          type: string
+        apellidoNombre:
+          type: string
+        especialidad:
+          type: string
+        diasTranscurridos:
+          type: integer
+        alerta:
+          type: string
+        estado:
+          type: string
+
+    SeguimientoDiario:
+      type: object
+      required: [sin30dias, sin60dias, sin90dias]
+      properties:
+        sin30dias:
+          type: array
+          items:
+            $ref: "#/components/schemas/Interconsulta"
+        sin60dias:
+          type: array
+          items:
+            $ref: "#/components/schemas/Interconsulta"
+        sin90dias:
+          type: array
+          items:
+            $ref: "#/components/schemas/Interconsulta"
+
+    ReporteData:
+      type: object
+      required: [mes, anio, pendientes, turnosOtorgados, atendidos, criticos, porEspecialidad]
+      properties:
+        mes:
+          type: integer
+        anio:
+          type: integer
+        pendientes:
+          type: integer
+        turnosOtorgados:
+          type: integer
+        atendidos:
+          type: integer
+        criticos:
+          type: integer
+        porEspecialidad:
+          type: array
+          items:
+            $ref: "#/components/schemas/EspecialidadCount"
+
+    EspecialidadCount:
+      type: object
+      required: [especialidad, total]
+      properties:
+        especialidad:
+          type: string
+        total:
+          type: integer
+
+    Configuracion:
+      type: object
+      required: [id, diasAlertaAmarilla, diasAlertaNaranja, diasAlertaRoja, rutaAdjuntos, rutaBackups]
+      properties:
+        id:
+          type: integer
+        diasAlertaAmarilla:
+          type: integer
+        diasAlertaNaranja:
+          type: integer
+        diasAlertaRoja:
+          type: integer
+        rutaAdjuntos:
+          type: string
+        rutaBackups:
+          type: string
+
+    ConfiguracionInput:
+      type: object
+      properties:
+        diasAlertaAmarilla:
+          type: integer
+        diasAlertaNaranja:
+          type: integer
+        diasAlertaRoja:
+          type: integer
+        rutaAdjuntos:
+          type: string
+        rutaBackups:
+          type: string
