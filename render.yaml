@@ -1,8 +1,3 @@
-databases:
-  - name: sigit-db
-    databaseName: sigit
-    user: sigit
-
 services:
   - type: web
     name: sigit-personal
@@ -11,9 +6,7 @@ services:
     plan: free
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: sigit-db
-          property: connectionString
+        sync: false
       - key: PORT
         value: 3000
       - key: NODE_ENV
