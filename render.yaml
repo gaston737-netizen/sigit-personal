@@ -1,13 +1,13 @@
 databases:
   - name: sigit-db
     databaseName: sigit
-    plan: free
+    user: sigit
 
 services:
   - type: web
     name: sigit-personal
     runtime: docker
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: Dockerfile
     plan: free
     envVars:
       - key: DATABASE_URL
